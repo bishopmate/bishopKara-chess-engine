@@ -3,8 +3,6 @@
     It will also generate all the valid moves from the current state.
     It will also contain a log of all the moves played till the current state.
 """
-
-
 class GameState():
     def __init__(self):
         # The chessboard is an 8 by 8 2D list, each element of the list has 2 characters
@@ -13,12 +11,12 @@ class GameState():
         # And the second character represents the type of the piece 'p' - pawn, 'R' - rook, 'N' - Knight, 'B' - Bishop 'Q' - Queen, 'K' - King
         self.board = [
             ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
-            ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
-            ["--", "--", "--", "--", "--", "--", "--", "--", ],
-            ["--", "--", "--", "--", "--", "--", "--", "--", ],
-            ["--", "--", "--", "--", "--", "--", "--", "--", ],
-            ["--", "--", "--", "--", "--", "--", "--", "--", ],
-            ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
+            ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
             ["bR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
         ]
         self.whiteToMove = True
