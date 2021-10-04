@@ -1,67 +1,78 @@
 """
     This is our main interaction file, which will be responsible for handling user Input and displaying the current GameState Object.
 """
-import pygame as p
 
+import pygame as p
 import chessEngine
 
-WIDTH = HEIGHT = 840
+WIDTH = HEIGHT = 512
 DIMENSION = 8
 SQUARE_SIZE = HEIGHT // DIMENSION
-MAX_FPS = 18
+MAX_FPS = 18 # we'll use it for animation
 IMAGES = {}
 
-'''
-    Initialising a global dictionary of images. It will be only called once initially to load the images of the pieces
-'''
+# all folders are inside this PATH so write like: {PATH}src/chessEngine.py
+PATH = "C:/Users/RAHUL/Desktop/Rahul/VSCode/.vscode/project/chess_engine/bishopKara-chess-engine/"
 
+"""
+    Initialize global dictionary of images. called only once
+"""
 
 def loadImages():
-    pieces = ["bp", "wp", "bR", "bN", "bB", "bQ", "bK", "wR", "wN", "wB", "wQ", "wK"]
+    pieces = ['wQ' , 'wK' , 'wP' , 'wR' , 'wN' , 'wB' , 'bQ' , 'bK' , 'bP' , 'bR' , 'bN' , 'bB']
+
     for piece in pieces:
-        IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQUARE_SIZE, SQUARE_SIZE))
+        IMAGES[piece] = p.transform.scale(p.image.load(f"{PATH}images/{piece}.png") , (SQUARE_SIZE , SQUARE_SIZE))
 
+    # now we can access any image like IMAGES['wP']
 
-'''
-    Main part of our code. Will handle the user input and graphics
-'''
-
+"""
+    The main driver for our code. this will update user input and also changes graphics
+"""
 
 def main():
     p.init()
-    screen = p.display.set_mode((WIDTH, HEIGHT))
+    screen = p.display.set_mode((WIDTH , HEIGHT))
     clock = p.time.Clock()
-    screen.fill(p.Color("white"))
+    screen.fill(p.Color('white'))
+
     gs = chessEngine.GameState()
-    print(gs.board)
-    loadImages()  # Only need to run this function once
+    loadImages()
+
     running = True
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
-        drawGameState(screen, gs)
+        drawGameState(screen , gs)
         clock.tick(MAX_FPS)
         p.display.flip()
 
 
-def drawGameState(screen, gs):
-    drawBoard(screen)  # draw squares on the board
-    # drawPieces(screen, gs.board)# draw pieces on a square
+"""
+    Responsible for graphics of current game state
+"""
+
+def drawGameState(screen , gs):
+    drawBoard(screen) #draw sqaures on the board
+    #add suggestion or highlighting (later)
+    drawPieces(screen , gs.board) #draw pieces on top of that squares
 
 
 def drawBoard(screen):
-    for x in range(8):
-        for y in range(8):
-            topLeftX = x * SQUARE_SIZE
-            topLeftY = y * SQUARE_SIZE
-            squareColor = "white"
-            if (x + y) & 1:  # start from black
-                squareColor = "grey"
+    colors = [p.Color('white') , p.Color('gray')]
 
-            if squareColor == "grey":
-                p.draw.rect(screen, squareColor, (topLeftX, topLeftY, SQUARE_SIZE, SQUARE_SIZE))
+    for r in range(DIMENSION):
+        for c in range(DIMENSION):
+            color = colors[(r+c)%2]
+            p.draw.rect(screen , color , p.Rect(c*SQUARE_SIZE , r*SQUARE_SIZE , SQUARE_SIZE , SQUARE_SIZE))
 
+def drawPieces(screen , board):
+    for r in range(DIMENSION):
+        for c in range(DIMENSION):
+            piece = board[r][c]
+            if piece != "--": # not piece then draw
+                screen.blit(IMAGES[piece] , p.Rect(c*SQUARE_SIZE , r*SQUARE_SIZE , SQUARE_SIZE , SQUARE_SIZE))
 
 if __name__ == "__main__":
     main()
