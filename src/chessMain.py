@@ -11,10 +11,6 @@ SQUARE_SIZE = HEIGHT // DIMENSION
 MAX_FPS = 18 # we'll use it for animation
 IMAGES = {}
 
-import os
-# all folders are inside this PATH so write like: {PATH}src/chessEngine.py
-
-
 """
     Initialize global dictionary of images. called only once
 """
@@ -38,12 +34,32 @@ def main():
 
     gs = chessEngine.GameState()
     loadImages()
-
+    squareSelected = ()
+    playerClicks = []
     running = True
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+            elif e.type == p.MOUSEBUTTONDOWN:
+                location = p.mouse.get_pos() # returns a tuple (x,y) of mouse coordinates
+                col = location[0]//SQUARE_SIZE
+                row = location[1]//SQUARE_SIZE
+                if squareSelected == (row, col): # same square has been clicked twice, then we deselect the click
+                    squareSelected = ()
+                    playerClicks = []
+                else: # different square selected than the first click
+                    squareSelected = (row, col)
+                    playerClicks.append(squareSelected)
+                
+                if  len(playerClicks) == 2:# user wants to move a piece
+                    move = chessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                    print(move.getChessNotation())
+                    gs.makeMove(move)
+                    # reset user clicks
+                    squareSelected = ()
+                    playerClicks = []
+
         drawGameState(screen , gs)
         clock.tick(MAX_FPS)
         p.display.flip()
@@ -54,7 +70,7 @@ def main():
     Responsible for graphics of current game state
 """
 def drawGameState(screen , gs):
-    drawBoard(screen) #draw sqaures on the board
+    drawBoard(screen) #draw squares on the board
     #add suggestion or highlighting (later)
     drawPieces(screen , gs.board) #draw pieces on top of that squares
 
@@ -62,19 +78,21 @@ def drawGameState(screen , gs):
 
 def drawBoard(screen):
     colors = [p.Color('white') , p.Color('gray')]
-    for r in range(DIMENSION):
-        for c in range(DIMENSION):
-            color = colors[(r+c)%2]
-            p.draw.rect(screen , color , p.Rect(c*SQUARE_SIZE , r*SQUARE_SIZE , SQUARE_SIZE , SQUARE_SIZE))
+    for row in range(DIMENSION):
+        for col in range(DIMENSION):
+            color = colors[(row+col)%2]# sum of the row number and column number in all white squares is even
+            p.draw.rect(screen , color , p.Rect(col*SQUARE_SIZE , row*SQUARE_SIZE , SQUARE_SIZE , SQUARE_SIZE))
 
 
 
 def drawPieces(screen , board):
-    for r in range(DIMENSION):
-        for c in range(DIMENSION):
-            piece = board[r][c]
-            if piece != "--": # not piece then draw
-                screen.blit(IMAGES[piece] , p.Rect(c*SQUARE_SIZE , r*SQUARE_SIZE , SQUARE_SIZE , SQUARE_SIZE))
+    for row in range(DIMENSION):
+        for col in range(DIMENSION):
+            piece = board[row][col]
+            if piece != "--": # not empty square then draw the piece
+                screen.blit(IMAGES[piece] , p.Rect(col*SQUARE_SIZE , row*SQUARE_SIZE , SQUARE_SIZE , SQUARE_SIZE))
+
+
 
 
 
