@@ -19,9 +19,11 @@ class GameState():
             ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
         ]
+        self.moveFunctions = {'P' : self.getPawnMoves, 'R' : self.getRookMoves, 'N' : self.getKnightMoves,
+         'B' : self.getBishopMoves, 'Q' : self.getQueenMoves, 'K' : self.getKingMoves}
         self.whiteToMove = True
         self.movesLog = []
-
+        
 
     """
         Takes a move and executes it (will not work for castling , pawn promotion , en-passant)
@@ -55,16 +57,13 @@ class GameState():
         All moves without checking
     """
     def getAllPossibleMoves(self):
-        moves = [Move((6,4) , (4,4) , self.board)]
+        moves = []
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
                 turn = self.board[row][col][0]
                 if (turn == 'b' and not self.whiteToMove) or (turn == 'w' and self.whiteToMove):
                     piece = self.board[row][col][1]
-                    if piece == 'P':
-                        self.getPawnMoves(row , col , moves)
-                    elif piece == 'R':
-                        self.getRookMoves(row , col , moves)
+                    self.moveFunctions[piece](row,col,moves)
         return moves
 
 
@@ -72,7 +71,31 @@ class GameState():
         Get all the possible moves for pawn (from row , col)
     """
     def getPawnMoves(self , row , col , moves):
-        pass
+        if self.whiteToMove:
+            if row-1 >=0 and self.board[row-1][col] == "--": # If the white pawn can be advanced one square
+                moves.append(Move((row, col), (row-1, col), self.board))
+                if row == 6 and self.board[row-2][col] == "--": # If the white pawn can advance 2 squares on initial move
+                    moves.append(Move((row, col), (row-2, col), self.board))
+            
+            # Capturing moves by capturing pieces of opposite color
+            if col-1 >=0 and self.board[row-1][col-1] != "--" and self.board[row-1][col-1][0] == 'b': # left diagonal move
+                moves.append(Move((row, col), (row-1, col-1), self.board))
+            if col+1 < 8 and self.board[row-1][col+1] != "--" and self.board[row-1][col+1][0] == 'b':  # right diagonal move
+                moves.append(Move((row, col), (row-1, col+1), self.board))
+                 
+        else:
+            if row+1 < 8 and self.board[row+1][col] == "--": # If the pawn can be advanced one square
+                moves.append(Move((row, col), (row+1, col), self.board))
+                if row == 1 and self.board[row+2][col] == "--": # If the black pawn can be advanced 2 squares on the initial move
+                    moves.append(Move((row, col), (row+2, col), self.board))
+            
+            # Capturing moves by capturing pieces of opposite color
+            if col-1 >=0 and self.board[row+1][col-1] != "--" and self.board[row+1][col-1][0] == 'w': # right diagonal move
+                moves.append(Move((row, col), (row+1, col-1), self.board))
+            if col+1 < 8 and self.board[row+1][col+1] != "--" and self.board[row+1][col+1][0] == 'w':  # left diagonal move
+                moves.append(Move((row, col), (row+1, col+1), self.board))
+            
+
 
     """
         Get all the possible moves for rook 
@@ -80,6 +103,33 @@ class GameState():
     def getRookMoves(self , row , col ,moves):
         pass
 
+    """
+        Get all the possible moves for knight 
+    """
+    def getKnightMoves(self , row , col ,moves):
+        pass
+
+    """
+        Get all the possible moves for bishop 
+    """
+    def getBishopMoves(self , row , col ,moves):
+        pass
+        
+    """
+        Get all the possible moves for queen 
+    """
+    def getQueenMoves(self , row , col ,moves):
+        pass
+    
+
+    """
+        Get all the possible moves for king 
+    """
+    def getKingMoves(self , row , col ,moves):
+        pass
+    
+    
+        
 
 class Move():
 
