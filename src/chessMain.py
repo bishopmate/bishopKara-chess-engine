@@ -3,6 +3,7 @@
 """
 
 import pygame as p
+from pygame.constants import KEYDOWN
 import chessEngine
 
 WIDTH = HEIGHT = 512
@@ -34,14 +35,18 @@ def main():
 
     gs = chessEngine.GameState()
     loadImages()
-    squareSelected = ()
-    playerClicks = []
+
+    validMoves = gs.getValidMoves()
+    moveMade = False # Flag variable for when move is made
+
+    squareSelected = () # no squares selected initially and keeptracks of the last clicked
+    playerClicks = [] # keeptracks of player's click [(6,4) , (4,4)] -> move piece from (6,4) to (4,4)
     running = True
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
-            elif e.type == p.MOUSEBUTTONDOWN:
+            elif e.type == p.MOUSEBUTTONDOWN:  #mouse handler
                 location = p.mouse.get_pos() # returns a tuple (x,y) of mouse coordinates
                 col = location[0]//SQUARE_SIZE
                 row = location[1]//SQUARE_SIZE
@@ -52,13 +57,24 @@ def main():
                     squareSelected = (row, col)
                     playerClicks.append(squareSelected)
                 
-                if  len(playerClicks) == 2:# user wants to move a piece
+                if  len(playerClicks) == 2:# user wants to move a piece or 2nd click
                     move = chessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                     print(move.getChessNotation())
-                    gs.makeMove(move)
+                    if move in validMoves:
+                        gs.makeMove(move)
+                        moveMade = True
                     # reset user clicks
                     squareSelected = ()
                     playerClicks = []
+            elif e.type == p.KEYDOWN:    #keyboard handler
+                if e.key == p.K_z:  # control + z then undo move
+                    gs.undoMove()
+                    moveMade = True
+                    
+        
+        if moveMade:
+            validMoves = gs.getValidMoves()
+            moveMade = False
 
         drawGameState(screen , gs)
         clock.tick(MAX_FPS)
@@ -91,8 +107,6 @@ def drawPieces(screen , board):
             piece = board[row][col]
             if piece != "--": # not empty square then draw the piece
                 screen.blit(IMAGES[piece] , p.Rect(col*SQUARE_SIZE , row*SQUARE_SIZE , SQUARE_SIZE , SQUARE_SIZE))
-
-
 
 
 
