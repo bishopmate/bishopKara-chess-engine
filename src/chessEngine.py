@@ -23,39 +23,93 @@ class GameState():
          'B' : self.getBishopMoves, 'Q' : self.getQueenMoves, 'K' : self.getKingMoves}
         self.whiteToMove = True
         self.movesLog = []
-        
+        self.whiteKingLocation = (7,4)
+        self.blackKingLocation = (0,4)
+        self.checkMate = False
+        self.staleMate = False
 
-    """
+    '''
         Takes a move and executes it (will not work for castling , pawn promotion , en-passant)
-    """
+    '''
     def makeMove(self, move):
         self.board[move.startRow][move.startCol] = "--"
         self.board[move.endRow][move.endCol] = move.pieceMoved
         self.movesLog.append(move) # log the move so it can be used to undo if needed
         self.whiteToMove = not self.whiteToMove # opposite player's turn
+        if move.pieceMoved == "wK":
+            self.whiteKingLocation = (move.endRow, move.endCol)
+        elif move.pieceMoved == "bK":
+            self.blackKingLocation = (move.endRow, move.endCol)
 
-
-    """
+    '''
         Undo the last move
-    """
+    '''
     def undoMove(self):
         if len(self.movesLog) != 0: #there should be some move
             move = self.movesLog.pop()
             self.board[move.startRow][move.startCol] = move.pieceMoved
             self.board[move.endRow][move.endCol] = move.pieceCaptured
             self.whiteToMove = not self.whiteToMove
+            if move.pieceMoved == "wK":
+                self.whiteKingLocation = (move.startRow, move.startCol)
+            elif move.pieceMoved == "bK":
+                self.blackKingLocation = (move.startRow, move.startCol)
 
-
-    """
-        All moves with checking
-    """
+    '''
+        All moves considering checks(King Under Attack)
+    '''
     def getValidMoves(self):
-        return self.getAllPossibleMoves() # just for now
+        # 1) generate all possible moves
+        moves = self.getAllPossibleMoves() # just for now
+        # 2) make the move
+        for i in range(len(moves)-1, -1, -1):
+            self.makeMove(moves[i])
+            # 3) generate all opponent's moves
+            # 4) for each of your opponent's moves, see if they attack your king
+            self.whiteToMove = not self.whiteToMove
+            if self.inCheck():
+                moves.remove(moves[i]) # if the current player's king is still under attack then remove this move
+            self.whiteToMove = not self.whiteToMove
+            self.undoMove()
+        
+        if len(moves) == 0: # either in checkmate or stalemate
+            if self.inCheck():
+                self.checkMate = True
+            else:
+                self.staleMate = True
+        else:
+            # Just in case we undo after a checkmate/stalemate make it false explicitly to avoid any leaks by undo
+            self.checkMate = False
+            self.staleMate = False
 
+        return moves
+    
+    '''
+        Determine if the current player is in check
+    '''
 
-    """
-        All moves without checking
-    """
+    def inCheck(self):
+        if self.whiteToMove:
+            return self.squareUnderAttack(self.whiteKingLocation[0], self.whiteKingLocation[1])
+        else:
+            return self.squareUnderAttack(self.blackKingLocation[0], self.blackKingLocation[1])
+
+    '''
+        Determine if the enemy can attack the square(row, col)
+    '''
+
+    def squareUnderAttack(self, row, col):
+        self.whiteToMove = not self.whiteToMove # switch to opponent's point of view
+        oppMoves = self.getAllPossibleMoves()
+        self.whiteToMove = not self.whiteToMove # switch back to original turn
+        for move in oppMoves:
+            if move.endRow == row and move.endCol == col: # square is under attack
+                return True
+        return False
+
+    '''
+        All moves without considering checks(King Under Attack)
+    '''
     def getAllPossibleMoves(self):
         moves = []
         for row in range(len(self.board)):
@@ -67,9 +121,9 @@ class GameState():
         return moves
 
 
-    """
+    '''
         Get all the possible moves for pawn (from row , col)
-    """
+    '''
     def getPawnMoves(self , row , col , moves):
         if self.whiteToMove:
             if row-1 >=0 and self.board[row-1][col] == "--": # If the white pawn can be advanced one square
@@ -97,9 +151,9 @@ class GameState():
             
         # add pawn promotion
 
-    """
+    '''
         Get all the possible moves for rook 
-    """
+    '''
     def getRookMoves(self , row , col ,moves):
         directions = [(-1,0) , (1,0) , (0,-1) , (0,1)]
         enemyColor = 'b' if self.whiteToMove else 'w'
@@ -120,9 +174,9 @@ class GameState():
                     break
 
 
-    """
+    '''
         Get all the possible moves for knight 
-    """
+    '''
     def getKnightMoves(self , row , col ,moves):
         knightMoves = [(-2,-1) , (-2,1) , (2,-1) , (2,1) , (1,2) , (1,-2) , (-1,2) , (-1,-2)]
         ourColor = 'w' if self.whiteToMove else 'b'
@@ -135,9 +189,9 @@ class GameState():
                     moves.append(Move((row,col) , (endRow , endCol) , self.board))
 
 
-    """
+    '''
         Get all the possible moves for bishop 
-    """
+    '''
     def getBishopMoves(self , row , col ,moves):
         directions = [(-1,-1) , (1,1) , (1,-1) , (-1,1)]  # just a diagonal
         enemyColor = 'b' if self.whiteToMove else 'w'
@@ -158,17 +212,17 @@ class GameState():
                     break
         
 
-    """
+    '''
         Get all the possible moves for queen 
-    """
+    '''
     def getQueenMoves(self , row , col ,moves):
         self.getBishopMoves(row,col,moves)
         self.getRookMoves(row,col,moves)
 
 
-    """
+    '''
         Get all the possible moves for king 
-    """
+    '''
     def getKingMoves(self , row , col ,moves):
         kingMoves = [(-1,0) , (0,-1) , (1,0) , (0,1) , (-1,1) , (-1,-1) , (1,-1) , (1,1)]
         ourColor = 'w' if self.whiteToMove else 'b'
