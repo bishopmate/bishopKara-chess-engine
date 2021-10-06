@@ -95,38 +95,90 @@ class GameState():
             if col+1 < 8 and self.board[row+1][col+1] != "--" and self.board[row+1][col+1][0] == 'w':  # left diagonal move
                 moves.append(Move((row, col), (row+1, col+1), self.board))
             
-
+        # add pawn promotion
 
     """
         Get all the possible moves for rook 
     """
     def getRookMoves(self , row , col ,moves):
-        pass
+        directions = [(-1,0) , (1,0) , (0,-1) , (0,1)]
+        enemyColor = 'b' if self.whiteToMove else 'w'
+        for d in directions:
+            for i in range(1,8):
+                endRow = row + d[0]*i
+                endCol = col + d[1]*i
+                if endRow>=0 and endRow<8 and endCol>=0 and endCol<8:
+                    endPiece = self.board[endRow][endCol]
+                    if endPiece == '--':
+                        moves.append(Move((row,col) , (endRow , endCol) , self.board))
+                    elif endPiece[0] == enemyColor:   # if we capture then we need to break 
+                        moves.append(Move((row,col) , (endRow , endCol) , self.board))
+                        break
+                    else: # if our piece is there then also we need to break
+                        break
+                else:
+                    break
+
 
     """
         Get all the possible moves for knight 
     """
     def getKnightMoves(self , row , col ,moves):
-        pass
+        knightMoves = [(-2,-1) , (-2,1) , (2,-1) , (2,1) , (1,2) , (1,-2) , (-1,2) , (-1,-2)]
+        ourColor = 'w' if self.whiteToMove else 'b'
+        for m in knightMoves:
+            endRow = row + m[0]
+            endCol = col + m[1]
+            if endRow>=0 and endRow<8 and endCol>=0 and endCol<8:
+                endPiece = self.board[endRow][endCol]
+                if endPiece[0] != ourColor:
+                    moves.append(Move((row,col) , (endRow , endCol) , self.board))
+
 
     """
         Get all the possible moves for bishop 
     """
     def getBishopMoves(self , row , col ,moves):
-        pass
+        directions = [(-1,-1) , (1,1) , (1,-1) , (-1,1)]  # just a diagonal
+        enemyColor = 'b' if self.whiteToMove else 'w'
+        for d in directions:
+            for i in range(1,8):
+                endRow = row + d[0]*i
+                endCol = col + d[1]*i
+                if endRow>=0 and endRow<8 and endCol>=0 and endCol<8:
+                    endPiece = self.board[endRow][endCol]
+                    if endPiece == '--':
+                        moves.append(Move((row,col) , (endRow , endCol) , self.board))
+                    elif endPiece[0] == enemyColor:   # if we capture then we need to break 
+                        moves.append(Move((row,col) , (endRow , endCol) , self.board))
+                        break
+                    else: # if our piece is there then also we need to break
+                        break
+                else:
+                    break
         
+
     """
         Get all the possible moves for queen 
     """
     def getQueenMoves(self , row , col ,moves):
-        pass
-    
+        self.getBishopMoves(row,col,moves)
+        self.getRookMoves(row,col,moves)
+
 
     """
         Get all the possible moves for king 
     """
     def getKingMoves(self , row , col ,moves):
-        pass
+        kingMoves = [(-1,0) , (0,-1) , (1,0) , (0,1) , (-1,1) , (-1,-1) , (1,-1) , (1,1)]
+        ourColor = 'w' if self.whiteToMove else 'b'
+        for m in kingMoves:
+            endRow = row + m[0]
+            endCol = col + m[1]
+            if endRow>=0 and endRow<8 and endCol>=0 and endCol<8:
+                endPiece = self.board[endRow][endCol]
+                if endPiece[0] != ourColor:
+                    moves.append(Move((row,col) , (endRow , endCol) , self.board))
     
     
         
