@@ -60,13 +60,16 @@ def main():
                 if  len(playerClicks) == 2:# user wants to move a piece or 2nd click
                     move = chessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                     print(move.getChessNotation())
-                    if move in validMoves:
-                        gs.makeMove(move)
-                        moveMade = True
-                        # reset user clicks
-                        squareSelected = ()
-                        playerClicks = []
-                    else:
+                    for i in range(len(validMoves)):
+                        if move == validMoves[i]:
+                            gs.makeMove(validMoves[i])
+                            moveMade = True
+                            # reset user clicks
+                            squareSelected = ()
+                            playerClicks = []
+                            break
+                    
+                    if not moveMade:
                         playerClicks = [squareSelected]
             elif e.type == p.KEYDOWN:    #keyboard handler
                 if e.key == p.K_z:  # control + z then undo move
