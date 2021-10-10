@@ -32,8 +32,8 @@ class GameState():
         self.pins = []
         self.checks = []
         self.enPassantPossible = () # coordinates of the square where en passant capture is possible
-        # self.checkMate = False   # for naive algorithm uncomment both lines
-        # self.staleMate = False
+        self.checkmate = False   
+        self.stalemate = False
         self.currCastlingRight = castleRights(True , True , True , True)
         self.castlingRightLog = [castleRights(self.currCastlingRight.wks , self.currCastlingRight.bks,
                                               self.currCastlingRight.wqs , self.currCastlingRight.bqs)]
@@ -65,7 +65,7 @@ class GameState():
             self.enPassantPossible = ((move.startRow+move.endRow//2), move.startCol)
         else : # this makes sure that only one enpassant is possible at a time and that too immediately after a 2 square advance
             self.enPassantPossible = ()
-        # print(self.enPassantPossible)
+        
 
         # castling
         if move.isCastleMove:
@@ -144,7 +144,6 @@ class GameState():
         All moves considering checks(King Under Attack)
     '''
     def getValidMoves(self):
-        # print(self.enPassantPossible)
         tempEnPassantPossible = self.enPassantPossible
         tempCastleRights = castleRights(self.currCastlingRight.wks , self.currCastlingRight.bks,
                                         self.currCastlingRight.wqs , self.currCastlingRight.bqs)
@@ -193,7 +192,11 @@ class GameState():
                 self.getCastleMoves(self.blackKingLocation[0] , self.blackKingLocation[1] , moves)
         self.enPassantPossible = tempEnPassantPossible
         self.currCastlingRight = tempCastleRights
-        # print(self.enPassantPossible)
+        if len(moves) == 0:
+            if self.inCheck:
+                self.checkmate = True
+            else:
+                self.stalemate = True
 
         return moves
 
@@ -576,7 +579,7 @@ class GameState():
                 else: #off-board
                     break
         #check for knight moves
-        knightMoves = [(-2,-1) , (-2 , 1) , (2,-1) , (2,1) , (-1,2) , (1,2) ,(-1,-2) , (-1,-2)]
+        knightMoves = [(-2,-1) , (-2 , 1) , (2,-1) , (2,1) , (-1,2) , (1,2) ,(1,-2) , (-1,-2)]
         for m in knightMoves:
             endRow = startRow + m[0]
             endCol = startCol + m[1]
@@ -618,10 +621,7 @@ class Move():
         self.isCastleMove = isCastleMove
 
         self.isEnPassantMove = isEnPassantMove
-        # print(self.isEnPassantMove)
         if self.isEnPassantMove:
-            # print(f"{startSquare} , {endSquare}")
-            print(f"({self.startRow} {self.startCol}) -> ({self.endRow}, {self.endCol})")
             self.pieceCaptured = "wP" if self.pieceMoved == "bP" else "bP"
 
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
