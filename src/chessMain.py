@@ -6,6 +6,7 @@ import pygame as pg
 import math
 from pygame.constants import KEYDOWN
 import chessEngine
+import smartMoveFinder
 
 WIDTH = HEIGHT = 512
 DIMENSION = 8
@@ -45,12 +46,17 @@ def main():
     playerClicks = [] # keeptracks of player's click [(6,4) , (4,4)] -> move piece from (6,4) to (4,4)
     running = True
     gameOver = False
+    playerOne = True # if a human is playing white,then this will be true and if AI is playing then this will be False
+    playerTwo = False # same as above but for Black
     while running:
+
+        humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
+
         for e in pg.event.get():
             if e.type == pg.QUIT:
                 running = False
             elif e.type == pg.MOUSEBUTTONDOWN:  #mouse handler
-                if not gameOver:
+                if not gameOver and humanTurn:
                     location = pg.mouse.get_pos() # returns a tuple (x,y) of mouse coordinates
                     col = location[0]//SQUARE_SIZE
                     row = location[1]//SQUARE_SIZE
@@ -89,7 +95,14 @@ def main():
                     moveMade = False
                     animate = False
 
-        
+        # AI Move finder 
+        if not gameOver and not humanTurn:
+            AIMove = smartMoveFinder.findRandomMove(validMoves)
+            gs.makeMove(AIMove)
+            moveMade = True
+            animate = True
+
+
         if moveMade:
             if(animate):
                 animateMove(gs.movesLog[-1], screen, gs.board, clock)
