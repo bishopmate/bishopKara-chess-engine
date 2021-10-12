@@ -3,7 +3,7 @@ import random
 pieceScore = {"K" : 200, "P" : 1, "B" : 3, "N" : 3, "R" : 5, "Q": 9} # Reference : https://en.wikipedia.org/wiki/Computer_chess#Leaf_evaluation
 CHECKMATE = 1300
 STALEMATE = 0
-DEPTH = 1
+DEPTH = 3
 
 def findRandomMove(validMoves):
     return validMoves[random.randint(0 , len(validMoves) - 1)]
@@ -66,8 +66,8 @@ def findMoveMinMax(gs , validMoves , depth , whiteToMove):
         maxScore = -CHECKMATE
         for move in validMoves:
             gs.makeMove(move)
-            nextMove = gs.getValidMoves()
-            score = findMoveMinMax(gs , nextMove , depth - 1 , False)
+            nextPossibleMoves = gs.getValidMoves()
+            score = findMoveMinMax(gs , nextPossibleMoves , depth - 1 , False)
             if score > maxScore:
                 maxScore = score
                 if depth == DEPTH:
@@ -78,8 +78,8 @@ def findMoveMinMax(gs , validMoves , depth , whiteToMove):
         minScore = CHECKMATE
         for move in validMoves:
             gs.makeMove(move)
-            nextMove = gs.getValidMoves()
-            score = findMoveMinMax(gs , nextMove , depth - 1 , True)
+            nextPossibleMoves = gs.getValidMoves()
+            score = findMoveMinMax(gs , nextPossibleMoves , depth - 1 , True)
             if score < minScore:
                 minScore = score
                 if depth == DEPTH:
