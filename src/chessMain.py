@@ -88,6 +88,7 @@ def main():
                     gs.undoMove() # comment this line for 2 player game, uncomment for player vs AI
                     moveMade = True
                     animate = False
+                    gameOver = False
                 elif e.key == pg.K_r: # reset the board when 'r' is pressed
                     gs = chessEngine.GameState()
                     validMoves = gs.getValidMoves()
@@ -99,7 +100,7 @@ def main():
 
         # AI Move finder 
         if not gameOver and not humanTurn:
-            AIMove = smartMoveFinder.findBestMove(gs, validMoves)
+            AIMove = smartMoveFinder.findBestMoveMinMax(gs, validMoves)
             if AIMove is None:
                 AIMove = smartMoveFinder.findRandomMove(validMoves)
             gs.makeMove(AIMove)
