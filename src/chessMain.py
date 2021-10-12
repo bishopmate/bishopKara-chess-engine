@@ -46,7 +46,7 @@ def main():
     playerClicks = [] # keeptracks of player's click [(6,4) , (4,4)] -> move piece from (6,4) to (4,4)
     running = True
     gameOver = False
-    playerOne = False # if a human is playing white,then this will be true and if AI is playing then this will be False
+    playerOne = True # if a human is playing white,then this will be true and if AI is playing then this will be False
     playerTwo = False # same as above but for Black
     while running:
 
