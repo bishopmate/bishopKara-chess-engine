@@ -46,7 +46,7 @@ def main():
     playerClicks = [] # keeptracks of player's click [(6,4) , (4,4)] -> move piece from (6,4) to (4,4)
     running = True
     gameOver = False
-    playerOne = True # if a human is playing white,then this will be true and if AI is playing then this will be False
+    playerOne = False # if a human is playing white,then this will be true and if AI is playing then this will be False
     playerTwo = False # same as above but for Black
     while running:
 
@@ -85,6 +85,7 @@ def main():
             elif e.type == pg.KEYDOWN:    #keyboard handler
                 if e.key == pg.K_z:  # control + z then undo move
                     gs.undoMove()
+                    gs.undoMove() # comment this line for 2 player game, uncomment for player vs AI
                     moveMade = True
                     animate = False
                 elif e.key == pg.K_r: # reset the board when 'r' is pressed
@@ -94,10 +95,13 @@ def main():
                     playerClicks = []
                     moveMade = False
                     animate = False
+                    gameOver = False
 
         # AI Move finder 
         if not gameOver and not humanTurn:
-            AIMove = smartMoveFinder.findRandomMove(validMoves)
+            AIMove = smartMoveFinder.findBestMove(gs, validMoves)
+            if AIMove is None:
+                AIMove = smartMoveFinder.findRandomMove(validMoves)
             gs.makeMove(AIMove)
             moveMade = True
             animate = True
