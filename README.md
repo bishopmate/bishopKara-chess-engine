@@ -6,3 +6,6 @@ chess engine
 
 <!-- GIF for enpassent -->
 ![Image](https://i.ibb.co/NWWXwrH/ezgif-com-gif-maker.gif)
+
+<!-- me vs AI -->
+![Image](https://i.ibb.co/FhyQvXr/final-Cut-Me-vs-AI-Spark-Video-1.gif)
