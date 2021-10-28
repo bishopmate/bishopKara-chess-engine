@@ -27,7 +27,7 @@ BishopKara-Chess-Engine
         The first player(playerOne variable in code) is considered here to be white and the second player(playerTwo variable in code) is considered to be black.
     </li>
     <li>
-        Whether a player is Human or AI is controlled by the line no. 49 and 50 for playerOne and playerTwo respectively<br/>
+        Whether a player is Human or AI is controlled by the line no. 49 and 50 for playerOne and playerTwo respectively in the chessMain.py file in the src directory<br/>
         A player is Human if the boolean value of the variable said above is set to <code>True</code> and AI if it is set to <code>False</code>(Yes, this means we can enjoy an AI vs AI match by setting both variables to <code>False</code>)
     </li>
 </ul>
