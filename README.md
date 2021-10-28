@@ -30,6 +30,9 @@ BishopKara-Chess-Engine
         Whether a player is Human or AI is controlled by the line no. 49 and 50 for playerOne and playerTwo respectively in the chessMain.py file in the src directory<br/>
         A player is Human if the boolean value of the variable said above is set to <code>True</code> and AI if it is set to <code>False</code>(Yes, this means we can enjoy an AI vs AI match by setting both variables to <code>False</code>)
     </li>
+    <li>
+        Pawn Promotion is limited to Queen Only for now
+    </li>
 </ul>
 <br/>
 <br/>
